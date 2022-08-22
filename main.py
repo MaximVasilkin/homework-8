@@ -34,7 +34,8 @@ class YaDisk():
         self.path_to = f'{path_to}/{file_name}'
         self._url = r'https://cloud-api.yandex.net/v1/disk/resources/upload'
         self._params = {'path': self.path_to, 'overwrite': 'true'}
-        self._headers = {'Content-Type': 'application/json', 'Authorization': f'OAuth {self.token}'}
+        self._headers = {'Content-Type': 'application/json',
+                         'Authorization': f'OAuth {self.token}'}
         self.check_meta = requests.get('https://cloud-api.yandex.net/v1/disk/resources',
                                   params={'path': '/'},
                                   headers=self._headers)
@@ -46,17 +47,22 @@ class YaDisk():
                          params={'path': f'/{path_to}'},
                          headers=self._headers)
             print(self.create_folder)
-            self.link = requests.get(self._url, params=self._params, headers=self._headers).json().get('href', None)
+            self.link = requests.get(self._url,
+                                     params=self._params,
+                                     headers=self._headers).json().get('href', None)
             print(requests.put(self.link, data=open(path_from, 'rb')))
         else:
-            self.link = requests.get(self._url, params=self._params, headers=self._headers).json().get('href', None)
+            self.link = requests.get(self._url,
+                                     params=self._params,
+                                     headers=self._headers).json().get('href', None)
             print(requests.put(self.link, data=open(path_from, 'rb')))
 
     def delete_file(self, path, permanently='false'):
         self.path = path
         self._url = r'https://cloud-api.yandex.net/v1/disk/resources'
         self._params = {'path': self.path, 'permanently': permanently}
-        self._headers = {'Content-Type': 'application/json', 'Authorization': f'OAuth {self.token}'}
+        self._headers = {'Content-Type': 'application/json',
+                         'Authorization': f'OAuth {self.token}'}
         print(requests.delete(self._url, params=self._params, headers=self._headers))
 
 
