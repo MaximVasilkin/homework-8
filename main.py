@@ -33,10 +33,24 @@ class YaDisk():
         self.path_from = path_from
         self.path_to = f'{path_to}/{file_name}'
         self._url = r'https://cloud-api.yandex.net/v1/disk/resources/upload'
-        self._params = {'path': self.path_to, 'owerwrite': 'true'}
+        self._params = {'path': self.path_to, 'overwrite': 'true'}
         self._headers = {'Content-Type': 'application/json', 'Authorization': f'OAuth {self.token}'}
-        self.link = requests.get(self._url, params=self._params, headers=self._headers).json().get('href', None)
-        print(requests.put(self.link, data=open(path_from, 'rb')))
+        self.check_meta = requests.get('https://cloud-api.yandex.net/v1/disk/resources',
+                                  params={'path': '/'},
+                                  headers=self._headers)
+        self.list_names = []
+        for item in self.check_meta.json()['_embedded']['items']:
+            self.list_names.append(item['name'])
+        if path_to and path_to not in self.list_names:
+            self.create_folder = requests.put('https://cloud-api.yandex.net/v1/disk/resources',
+                         params={'path': f'/{path_to}'},
+                         headers=self._headers)
+            print(self.create_folder)
+            self.link = requests.get(self._url, params=self._params, headers=self._headers).json().get('href', None)
+            print(requests.put(self.link, data=open(path_from, 'rb')))
+        else:
+            self.link = requests.get(self._url, params=self._params, headers=self._headers).json().get('href', None)
+            print(requests.put(self.link, data=open(path_from, 'rb')))
 
     def delete_file(self, path, permanently='false'):
         self.path = path
@@ -46,10 +60,14 @@ class YaDisk():
         print(requests.delete(self._url, params=self._params, headers=self._headers))
 
 
+
 if __name__ == '__main__':
     disk = YaDisk('token')
-    disk.uplaod_file('тестовый документ (1).txt')
-    #disk.delete_file('тестовый документ (1).txt')
+    disk.uplaod_file('тестовый документ (1).txt', 'Новая папка')
+#   disk.delete_file('тестовый документ (1).txt', 'Новая папка')
+
+
+
 
 
 
